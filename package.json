@@ -1,0 +1,11 @@
+{
+  "name": "react-mcp-inspector",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "build": "npm --prefix frontend run build",
+    "start": "npm run build && npm --prefix backend start",
+    "dev": "npm --prefix backend start & npm --prefix frontend run dev"
+  }
+}
