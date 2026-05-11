@@ -1,7 +1,7 @@
 {
   "name": "arunsiv-mcp-inspector",
-  "version": "1.0.1",
-  "description": "A custom MCP Inspector built with React and Node.js",
+  "version": "1.0.4",
+  "description": "A custom MCP Client built with React and Node.js",
   "type": "module",
   "bin": {
     "arunsiv-mcp-inspector": "./cli/cli.js"
@@ -10,7 +10,8 @@
     "client/bin",
     "client/dist",
     "server",
-    "cli"
+    "cli",
+    "README.md"
   ],
   "scripts": {
     "install:all": "npm --prefix server install && npm --prefix client install",

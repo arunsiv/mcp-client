@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import crypto from 'crypto';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
@@ -7,6 +8,29 @@ import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Proxy Authentication Middleware
+const sessionToken = process.env.MCP_PROXY_AUTH_TOKEN;
+const authMiddleware = (req, res, next) => {
+    if (!sessionToken) return next(); // Fallback if no token configured
+
+    const authHeader = req.headers["x-mcp-proxy-auth"];
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ error: "Unauthorized", message: "Missing or invalid proxy auth token." });
+    }
+
+    const providedToken = authHeader.substring(7);
+    const providedBuffer = Buffer.from(providedToken);
+    const expectedBuffer = Buffer.from(sessionToken);
+
+    if (providedBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(providedBuffer, expectedBuffer)) {
+        return res.status(401).json({ error: "Unauthorized", message: "Invalid proxy auth token." });
+    }
+
+    next();
+};
+
+app.use('/api', authMiddleware);
 
 let mcpClient = null;
 let currentTransport = null;
@@ -27,7 +51,7 @@ const cleanupConnection = async () => {
 app.post('/api/connect', async (req, res) => {
     try {
         const { type, config } = req.body;
-        
+
         await cleanupConnection();
 
         // 1. Initialize the client
@@ -49,7 +73,10 @@ app.post('/api/connect', async (req, res) => {
             if (!config?.url) {
                 return res.status(400).json({ error: "Missing URL for SSE transport" });
             }
-            currentTransport = new SSEClientTransport(new URL(config.url));
+            const headers = config.headers || {};
+            currentTransport = new SSEClientTransport(new URL(config.url), {
+                requestInit: { headers }
+            });
         } else {
             return res.status(400).json({ error: "Invalid transport type" });
         }
@@ -94,12 +121,12 @@ app.post('/api/tools/:name', async (req, res) => {
     try {
         const toolName = req.params.name;
         const toolArgs = req.body || {};
-        
+
         const result = await mcpClient.callTool({
             name: toolName,
             arguments: toolArgs
         });
-        
+
         res.json(result);
     } catch (error) {
         console.error("Error calling tool:", error);
@@ -107,8 +134,8 @@ app.post('/api/tools/:name', async (req, res) => {
     }
 });
 
-const PORT = process.env.SERVER_PORT || 3001;
-app.listen(PORT, () => {
+const PORT = process.env.SERVER_PORT || 6277;
+app.listen(PORT, '127.0.0.1', () => {
     console.log(`MCP Inspector Backend running on port ${PORT}`);
 });
 process.stdin.resume();

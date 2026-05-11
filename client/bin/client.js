@@ -10,7 +10,7 @@ const app = express();
 import http from 'http';
 
 app.use('/api', (req, res) => {
-    const SERVER_PORT = process.env.SERVER_PORT || 3001;
+    const SERVER_PORT = process.env.SERVER_PORT || 6277;
     const proxyReq = http.request({
         hostname: '127.0.0.1',
         port: SERVER_PORT,
@@ -37,7 +37,7 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.CLIENT_PORT || 6274;
-app.listen(PORT, () => {
+app.listen(PORT, '127.0.0.1', () => {
     console.log(`Frontend static server running on port ${PORT}`);
 });
 process.stdin.resume();

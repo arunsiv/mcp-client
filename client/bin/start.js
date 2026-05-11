@@ -2,10 +2,12 @@ import { spawn } from 'child_process';
 import open from 'open';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { randomBytes } from 'crypto';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const SERVER_PORT = process.env.SERVER_PORT || 3001;
-const CLIENT_PORT = process.env.CLIENT_PORT || 3000;
+const SERVER_PORT = process.env.SERVER_PORT || 6277;
+const CLIENT_PORT = process.env.CLIENT_PORT || 6274;
+const sessionToken = process.env.MCP_PROXY_AUTH_TOKEN || randomBytes(32).toString('hex');
 
 function spawnPromise(command, args, options) {
     return new Promise((resolvePromise, reject) => {
@@ -20,7 +22,7 @@ function spawnPromise(command, args, options) {
 
 async function main() {
     const isDev = process.argv.includes('--dev');
-    
+
     // Server options
     const serverPath = resolve(__dirname, '../../server/server.js');
     const clientPath = resolve(__dirname, './client.js');
@@ -32,7 +34,7 @@ async function main() {
 
     // Spawn server
     const serverProcess = spawnPromise('node', [serverPath], {
-        env: { ...process.env, SERVER_PORT, CLIENT_PORT },
+        env: { ...process.env, SERVER_PORT, CLIENT_PORT, MCP_PROXY_AUTH_TOKEN: sessionToken },
         stdio: 'inherit',
         signal: abort.signal
     });
@@ -54,8 +56,8 @@ async function main() {
         });
     }
 
-    const url = `http://localhost:${CLIENT_PORT}`;
-    
+    const url = `http://localhost:${CLIENT_PORT}/?MCP_PROXY_AUTH_TOKEN=${sessionToken}`;
+
     setTimeout(() => {
         console.log(`\n🚀 MCP Inspector is up and running at:\n   ${url}\n`);
         open(url).catch(err => console.error("Failed to automatically open browser", err));

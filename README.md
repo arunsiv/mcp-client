@@ -1,18 +1,18 @@
-# arunsiv-mcp-inspector
+# arunsiv-mcp-client
 
 A modern, premium React-based graphical interface for connecting to and interacting with Model Context Protocol (MCP) servers. 
 
-This client serves as a user-friendly alternative to the official CLI MCP Inspector. It provides dynamic forms based on tool schemas, rich text/image result rendering, and a beautiful dark-mode glassmorphism UI.
+This client serves as a user-friendly graphical interface for interacting with MCP servers. It provides dynamic forms based on tool schemas, rich text/image result rendering, and a beautiful dark-mode glassmorphism UI.
 
 ## Usage
 
-You can launch the inspector from any terminal by simply running:
+You can launch the client from any terminal by simply running:
 
 ```bash
 npx arunsiv-mcp-inspector
 ```
 
-This will automatically download the package, boot the local inspector servers, and open the beautiful UI directly in your browser.
+This will automatically download the package, boot the local client servers, and open the beautiful UI directly in your browser.
 
 ## Features
 
@@ -20,10 +20,12 @@ This will automatically download the package, boot the local inspector servers, 
 - **Dynamic Forms:** Automatically reads a tool's JSON `inputSchema` and generates user-friendly form fields (text inputs, numbers, dropdowns, checkboxes) so you never have to write raw JSON manually.
 - **Rich Result Rendering:** Instead of dumping raw JSON payloads, the UI parses the MCP `content` array to display formatted text and native images.
 - **Immediate Feedback:** Clear `SUCCESS` and `FAILURE` badges on tool execution.
+- **Remote Server Auth & Environment Variables:** Built-in UI to securely pass custom headers (like Bearer tokens) to remote SSE servers or inject API keys as environment variables into local Stdio servers.
+- **Zero-Config Local Security:** Employs a fully automatic, invisible cryptographic handshake between the CLI and the proxy server to ensure no malicious local scripts can execute your connected tools behind your back.
 
 ## Architecture
 
-This tool mirrors the robust architecture of the official MCP inspector. When you run the CLI, an orchestrator spins up two independent processes:
+This tool mirrors the robust architecture of the official MCP client. When you run the CLI, an orchestrator spins up two independent processes:
 
 1. **Proxy Server (`server`)**: A lightweight Node.js/Express proxy using the official `@modelcontextprotocol/sdk`. It establishes the underlying protocol connections (`stdio` or `SSE`) and acts as an HTTP bridge for the UI.
 2. **Frontend UI Server (`client`)**: A separate static file server that serves the compiled Vite + React Single Page Application (SPA), complete with a lightweight proxy to dynamically route `/api/*` traffic to the backend proxy.
