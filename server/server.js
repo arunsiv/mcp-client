@@ -3,12 +3,6 @@ import cors from 'cors';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import open from 'open';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
@@ -113,23 +107,8 @@ app.post('/api/tools/:name', async (req, res) => {
     }
 });
 
-// Serve static frontend files
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
-
-// Fallback for React Router (if used) or general SPA routing
-app.use((req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+const PORT = process.env.SERVER_PORT || 3001;
+app.listen(PORT, () => {
+    console.log(`MCP Inspector Backend running on port ${PORT}`);
 });
-
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, async () => {
-    const url = `http://localhost:${PORT}`;
-    console.log(`MCP Inspector Backend running on ${url}`);
-    
-    // Automatically open the browser
-    try {
-        await open(url);
-    } catch (err) {
-        console.error("Failed to automatically open browser", err);
-    }
-});
+process.stdin.resume();

@@ -1,11 +1,35 @@
 {
-  "name": "react-mcp-inspector",
+  "name": "arunsiv-mcp-inspector",
   "version": "1.0.0",
-  "private": true,
+  "description": "A custom MCP Inspector built with React and Node.js",
+  "type": "module",
+  "bin": {
+    "arunsiv-mcp-inspector": "./cli/cli.js"
+  },
+  "files": [
+    "client/bin",
+    "client/dist",
+    "server",
+    "cli"
+  ],
   "scripts": {
-    "install:all": "npm --prefix backend install && npm --prefix frontend install",
-    "build": "npm --prefix frontend run build",
-    "start": "npm run build && npm --prefix backend start",
-    "dev": "npm --prefix backend start & npm --prefix frontend run dev"
-  }
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "build": "npm --prefix client run build",
+    "start": "node cli/cli.js",
+    "dev": "node cli/cli.js --dev",
+    "prepublishOnly": "npm run install:all && npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "open": "^10.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-client",
+    "inspector"
+  ],
+  "author": "Arun",
+  "license": "MIT"
 }

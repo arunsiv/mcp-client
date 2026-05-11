@@ -1,0 +1,15 @@
+{
+  "name": "arunsiv-mcp-inspector-server",
+  "version": "1.0.0",
+  "description": "MCP Inspector Server",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}
